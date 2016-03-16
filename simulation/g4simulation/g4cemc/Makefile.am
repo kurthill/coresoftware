@@ -61,6 +61,8 @@ libcemc_la_SOURCES = \
   RawTowerCalibration_Dict.cc \
   RawTowerDigitizer.cc \
   RawTowerDigitizer_Dict.cc \
+	RawTowerFastSim.cc \
+	RawTowerFastSim_Dict.cc \
   BEmcCluster.cc \
   BEmcRec.cc
 
