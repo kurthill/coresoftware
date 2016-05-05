@@ -129,7 +129,7 @@ RawTowerFastSim::process_event(PHCompositeNode *topNode)
 				const double edep_smrd = smear_e( edep, pid ); 
 
 				// If particle energy is above spread threshhold
-				if ( edep > _spread_e_thresh )
+				if ( edep_smrd > _spread_e_thresh )
 				{
 					if (detector == "CEMC")
 					 spread_e_emc( raw_tower, tkey, edep_smrd, pid );
@@ -180,6 +180,10 @@ double RawTowerFastSim::smear_e(double e, int pid)
 		e_smrd = e + h_gaus;
 	}
 	else
+		e_smrd = 0;
+
+	// Force energy to be non-negative
+	if (e_smrd < 0)
 		e_smrd = 0;
 
 	return e_smrd;
@@ -366,6 +370,9 @@ RawTowerFastSim::add_calib_tower(
 	// Check if the tower exists
 	//   if yes:  add the smeared energy to existing
 	//   if no:  make new tower and add to container
+	if(e < 0)
+		return;
+
 	RawTower* got_twr = _calib_towers->getTower( key );
 	if ( got_twr )
 		got_twr->set_energy( e + got_twr->get_energy() );
@@ -382,6 +389,9 @@ RawTowerFastSim::add_calib_tower(
 void 
 RawTowerFastSim::add_calib_tower( int etabin, int phibin, double e )
 {
+	if(e < 0)
+		return;
+
 	RawTower* got_twr = _calib_towers->getTower( etabin, phibin );
 	if ( got_twr )
 		got_twr->set_energy( e + got_twr->get_energy() );
