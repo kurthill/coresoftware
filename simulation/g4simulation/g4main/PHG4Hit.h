@@ -14,7 +14,7 @@ class PHG4Hit: public PHObject
 
   virtual void identify(std::ostream& os = std::cout) const;
   virtual void Copy(PHG4Hit const &g4hit);
-  friend ostream &operator<<(ostream & stream, const PHG4Hit * hit);
+  friend std::ostream &operator<<(std::ostream & stream, const PHG4Hit * hit);
 
   // The indices here represent the entry and exit points of the particle
   virtual float get_x(const int i) const {return NAN;}
@@ -32,6 +32,7 @@ class PHG4Hit: public PHObject
   virtual PHG4HitDefs::keytype get_hit_id() const {return ULONG_LONG_MAX;}
   virtual int get_shower_id() const {return INT_MIN;}
   virtual int get_scint_id() const {return INT_MIN;}
+  virtual int get_row() const {return INT_MIN;}
   virtual int get_trkid() const {return INT_MIN;}
   virtual int get_strip_z_index() const {return INT_MIN;}
   virtual int get_strip_y_index() const {return INT_MIN;}
@@ -57,6 +58,7 @@ class PHG4Hit: public PHObject
   virtual void set_hit_id(const PHG4HitDefs::keytype i) {return;}
   virtual void set_shower_id(const int i) {return;}
   virtual void set_scint_id(const int i) {return;}
+  virtual void set_row(const int i) {return;}
   virtual void set_trkid(const int i) {return;}
   virtual void set_strip_z_index(const int i) {return;}
   virtual void set_strip_y_index(const int i) {return;}
@@ -105,6 +107,8 @@ class PHG4Hit: public PHObject
     prop_layer = 101,
     //! scintillator ID
     prop_scint_id = 102,
+    //! row (mother volume or steel plate id)
+    prop_row = 103,
 
     //! SVX stuff
     prop_strip_z_index = 110,
