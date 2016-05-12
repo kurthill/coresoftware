@@ -38,107 +38,107 @@ public:
   process_event(PHCompositeNode *topNode);
   int
   End(PHCompositeNode *topNode);
-	
+  
   void
   Detector(const std::string &d)
-	{
+  {
     detector = d;
-	}
+  }
 
   double get_em_sigma_p0() const 
-	{
-		return _em_sigma_p0;
-	}
+  {
+    return _em_sigma_p0;
+  }
   void set_em_sigma_p0(double p0) 
-	{
-		_em_sigma_p0 = p0;
-	}
+  {
+    _em_sigma_p0 = p0;
+  }
 
   double get_em_sigma_p1() const 
-	{
-		return _em_sigma_p1;
-	}
-	void set_em_sigma_p1(double p1) 
-	{
-		_em_sigma_p1 = p1;
-	}
+  {
+    return _em_sigma_p1;
+  }
+  void set_em_sigma_p1(double p1) 
+  {
+    _em_sigma_p1 = p1;
+  }
 
   double get_h_sigma_p0() const 
-	{
-		return _h_sigma_p0;
-	}
+  {
+    return _h_sigma_p0;
+  }
   
-	void set_h_sigma_p0(double p0)
-	{
-		_h_sigma_p0 = p0;
-	}
+  void set_h_sigma_p0(double p0)
+  {
+    _h_sigma_p0 = p0;
+  }
 
   double get_h_sigma_p1() const 
-	{
-		return _h_sigma_p1;
-	}
+  {
+    return _h_sigma_p1;
+  }
   
-	void set_h_sigma_p1(double p1)
-	{
-		_h_sigma_p1 = p1;
-	}
+  void set_h_sigma_p1(double p1)
+  {
+    _h_sigma_p1 = p1;
+  }
 
   std::string
   get_calib_tower_node_prefix() const
-	{
+  {
     return _calib_tower_node_prefix;
-	}
+  }
 
   void
   set_calib_tower_node_prefix(std::string calibTowerNodePrefix)
-	{
+  {
     _calib_tower_node_prefix = calibTowerNodePrefix;
-	}
+  }
 
   std::string
   get_raw_tower_node_prefix() const
-	{
+  {
     return _raw_tower_node_prefix;
-	}
+  }
 
   void
   set_raw_tower_node_prefix(std::string rawTowerNodePrefix)
-	{
+  {
     _raw_tower_node_prefix = rawTowerNodePrefix;
-	}
+  }
 
   double
   get_zero_suppression_GeV() const
-	{
+  {
     return _zero_suppression_GeV;
-	}
+  }
 
   void
   set_zero_suppression_GeV(double zeroSuppressionGeV)
-	{
+  {
     _zero_suppression_GeV = zeroSuppressionGeV;
-	}
+  }
 
   double
   get_spread_e_thresh() const
-	{
+  {
     return _spread_e_thresh;
-	}
+  }
 
   void
   set_spread_e_thresh(double spread_e_thresh)
-	{  
-		_spread_e_thresh = spread_e_thresh;
-	}
+  {  
+    _spread_e_thresh = spread_e_thresh;
+  }
 
 protected:
 
-	PHG4HitContainer* _hits;
-	PHG4CylinderCellContainer* _cells;
+  PHG4HitContainer* _hits;
+  PHG4CylinderCellContainer* _cells;
   RawTowerContainer* _calib_towers;
   RawTowerContainer* _raw_towers;
   RawTowerGeomContainer *rawtowergeom;
-	PHG4TruthInfoContainer* truthinfo;
+  PHG4TruthInfoContainer* truthinfo;
 
   std::string detector;
   std::string HitNodeName;
@@ -146,7 +146,7 @@ protected:
   std::string RawTowerNodeName;
   std::string CaliTowerNodeName;
   std::string TowerGeomNodeName;
-	std::string TruthInfoNodeName;
+  std::string TruthInfoNodeName;
 
   std::string _calib_tower_node_prefix;
   std::string _raw_tower_node_prefix;
@@ -158,65 +158,84 @@ protected:
   //! hadron smear sigma function params p0/sqrt(E) + p1
   double _h_sigma_p0;
   double _h_sigma_p1;
-	
+  
+  //! hadron emc energy smear function params p0 + p1*E
+  double _mip_thresh;
+  double _mip_percent;
+  double _mip_mean;
+  double _mip_sigma;
+  double _h_emc_mean_p0;
+  double _h_emc_mean_p1;
+  double _h_emc_sigma_p0;
+  double _h_emc_sigma_p1;
+  
+  //! emc spatial smear function params p0 + p1*E
+  int    _ndeposits;
+  double _em_emc_spa_eta_sigma;
+  double _em_emc_spa_phi_sigma;
+  double _mip_spa_eta_sigma;
+  double _mip_spa_phi_sigma;
+  double _h_emc_spa_eta_sigma;
+  double _h_emc_spa_phi_sigma;
+
   //! zero suppression in unit of GeV
   double _zero_suppression_GeV;
-	
-	//! only spread energy into surrounding towers if above this
-	double _spread_e_thresh;
+  
+  //! only spread energy into surrounding towers if above this
+  double _spread_e_thresh;
 
   PHTimeServer::timer _timer;
 
-	unsigned int seed;
+  unsigned int seed;
 
 
   /////////////////////// 
-	//  private methods ///
-	//
-	
+  //  private methods ///
+  //
+  
   void
   CreateNodes(PHCompositeNode *topNode);
-	
-	void 
-	spread_e_emc( 
-			const RawTower* raw_tower, 
-			unsigned int key, 
-			double e, 
-			int pid );
+  
+  void 
+  spread_e_emc( 
+      float eta,
+      float phi, 
+      double e, 
+      int pid );
 
-	void 
-	spread_e_hcal( 
-			const RawTower* raw_tower, 
-			unsigned int key, 
-			double e, 
-			int pid );
+  void 
+  spread_e_hcal( 
+      const RawTower* raw_tower, 
+      unsigned int key, 
+      double e, 
+      int pid );
 
-	void
-	add_calib_tower( 
-			const RawTower* raw_tower, 
-			unsigned int tkey,
-			double e );
+  void
+  add_calib_tower( 
+      const RawTower* raw_tower, 
+      unsigned int tkey,
+      double e );
 
-	void 
-	add_calib_tower( 
-			int etabin, 
-			int phibin, 
-			double e );
+  void 
+  add_calib_tower( 
+      int etabin, 
+      int phibin, 
+      double e );
 
-	double 
-	smear_e( 
-			double e, 
-			int pid );
-	
-	bool 
-	is_em_particle(int pid);
-	
-	bool 
-	is_hadron(int pid);
+  double 
+  smear_e( 
+      double e, 
+      int pid );
+  
+  bool 
+  is_em_particle(int pid);
+  
+  bool 
+  is_hadron(int pid);
 
-	#ifndef __CINT__
+  #ifndef __CINT__
   gsl_rng *RandomGenerator;
-	#endif
+  #endif
 };
 
 #endif /* RawTowerFastSim_H__ */

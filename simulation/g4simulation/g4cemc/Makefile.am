@@ -8,6 +8,7 @@ lib_LTLIBRARIES = \
 INCLUDES = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
+  -I$(OFFLINE_MAIN)/include/eigen3 \
   -I$(ROOTSYS)/include \
   -I${G4_MAIN}/include \
   -I${G4_MAIN}/include/Geant4
@@ -73,6 +74,8 @@ libcemc_io_la_LDFLAGS = \
   -L$(OFFLINE_MAIN)/lib
 
 libcemc_io_la_LIBADD = \
+  -lg4hough_io \
+  -lg4hough \
   -lphool
 
 libcemc_la_LDFLAGS = \
