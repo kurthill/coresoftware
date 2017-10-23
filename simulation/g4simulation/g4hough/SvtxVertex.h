@@ -48,7 +48,7 @@ public:
   virtual void         set_chisq(float chisq)                {}
 
   virtual unsigned int get_ndof() const                      {return UINT_MAX;}
-  virtual void         set_ndof(float ndof)                  {}
+  virtual void         set_ndof(unsigned int ndof)           {}
   
   virtual float        get_position(unsigned int coor) const          {return NAN;}
   virtual void         set_position(unsigned int coor, float xi)      {}
@@ -61,7 +61,7 @@ public:
   //
   virtual void           clear_tracks()                         {}
   virtual bool           empty_tracks()                         {return true;}
-  virtual size_t         size_tracks()                          {return 0;}
+  virtual size_t         size_tracks() const                          {return 0;}
   virtual void           insert_track(unsigned int trackid)     {}
   virtual size_t         erase_track(unsigned int trackid)      {return 0;}
   virtual ConstTrackIter begin_tracks() const                   {return TrackSet().end();}

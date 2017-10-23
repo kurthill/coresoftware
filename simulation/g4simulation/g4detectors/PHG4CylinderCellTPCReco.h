@@ -3,53 +3,67 @@
 
 #include <fun4all/SubsysReco.h>
 #include <phool/PHTimeServer.h>
+
+// rootcint barfs with this header so we need to hide it
+#ifndef __CINT__
+#include <gsl/gsl_rng.h>
+#endif
+
+
 #include <string>
 #include <map>
-#include "TRandom3.h"
 
 class PHCompositeNode;
-class PHG4CylinderCell;
+class PHG4TPCDistortion;
+class TH1;
+class TProfile2D;
 
 class PHG4CylinderCellTPCReco : public SubsysReco
 {
 public:
   
-  PHG4CylinderCellTPCReco(const std::string &name = "CYLINDERTPCRECO");
+  PHG4CylinderCellTPCReco( const int n_pixel=2, const std::string &name = "CYLINDERTPCRECO");
   
-  virtual ~PHG4CylinderCellTPCReco(){}
+  virtual ~PHG4CylinderCellTPCReco();
   
   //! module initialization
+  int Init(PHCompositeNode *topNode);
   int InitRun(PHCompositeNode *topNode);
-  
-  //! run initialization
-  int Init(PHCompositeNode *topNode) {return 0;}
   
   //! event processing
   int process_event(PHCompositeNode *topNode);
   
-  //! end of process
-  int End(PHCompositeNode *topNode);
-  
   void Detector(const std::string &d);
   void cellsize(const int i, const double sr, const double sz);
-//   void etaphisize(const int i, const double deltaeta, const double deltaphi);
-  void checkenergy(const int i=1) {chkenergyconservation = i;}
   void OutputDetector(const std::string &d) {outdetector = d;}
 
-  void setDiffusion( double diff ){diffusion = diff;}
-  void setElectronsPerKeV( double epk ){elec_per_kev = epk;}
+  void setHalfLength(const double hz){fHalfLength = hz;}
+  void setDiffusionL(const double diff){fDiffusionL = diff;}
+  void setDiffusionT(const double diff){fDiffusionT = diff;}
+  void setElectronsPerKeV(const double epk){elec_per_gev = epk*1e6;}
+  void set_drift_velocity(const double cm_per_ns) { driftv = cm_per_ns;}
+
+  void setSmearRPhi(const double v) {fFractRPsm=v;}
+  void setSmearZ(const double v) {fFractZZsm=v;}
+
+  void setShapingRMSLead(const double v) {fShapingLead=v;}
+  void setShapingRMSTail(const double v) {fShapingTail=v;}
   
+  double get_timing_window_min(const int i) {return tmin_max[i].first;}
+  double get_timing_window_max(const int i) {return tmin_max[i].second;}
+  void   set_timing_window(const int i, const double tmin, const double tmax) {
+    tmin_max[i] = std::make_pair(tmin,tmax);
+  }
+  void   set_timing_window_defaults(const double tmin, const double tmax) {
+    tmin_default = tmin; tmax_default = tmax;
+  }
+
+  //! distortion to the primary ionization
+  void setDistortion (PHG4TPCDistortion * d) {distortion = d;}
+
 protected:
-//   void set_size(const int i, const double sizeA, const double sizeB, const int what);
-//   int CheckEnergy(PHCompositeNode *topNode);
-//   static std::pair<double, double> get_etaphi(const double x, const double y, const double z);
-//   static double get_eta(const double radius, const double z);
-//   bool lines_intersect( double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double* rx, double* ry);
-//   bool line_and_rectangle_intersect( double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double* rr);
-  
-  std::map<int, int>  binning;
-  std::map<int, std::pair <double,double> > cell_size; // cell size in phi/z
-  std::map<int, std::pair <double,double> > zmin_max; // zmin/zmax for each layer for faster lookup
+  std::map<int, int> binning;
+  std::map<int, std::pair<double,double>> cell_size; // cell size in phi/z
   std::map<int, double> phistep;
   std::map<int, double> etastep;
   std::string detector;
@@ -58,16 +72,40 @@ protected:
   std::string cellnodename;
   std::string geonodename;
   std::string seggeonodename;
-  std::map<int, std::pair<int, int> > n_phi_z_bins;
-  
+  std::map<int, std::pair<int, int>> n_phi_z_bins;
+  PHTimeServer::timer _timer;
   int nbins[2];
-  int chkenergyconservation;
   
-  TRandom3 rand;
+  double fHalfLength;
+  double fDiffusionT;
+  double fDiffusionL;
+  double elec_per_gev;
+  double driftv;
 
-  double diffusion;
-  double elec_per_kev;
+  int num_pixel_layers;
+
+  double tmin_default;
+  double tmax_default;
+  std::map<int,std::pair<double,double>> tmin_max;
   
+  //! distortion to the primary ionization if not NULL
+  PHG4TPCDistortion * distortion;
+  TH1 *fHElectrons;
+  TProfile2D *fHWindowP;
+  TProfile2D *fHWindowZ;
+  TProfile2D *fHMeanEDepPerCell;
+  TProfile2D *fHMeanElectronsPerCell;
+  TProfile2D *fHErrorRPhi;
+  TProfile2D *fHErrorZ;
+  double fFractRPsm;
+  double fFractZZsm;
+  double fShapingLead;
+  double fShapingTail;
+#ifndef __CINT__
+  //! random generator that conform with sPHENIX standard
+  gsl_rng *RandomGenerator;
+#endif
+
 };
 
 #endif

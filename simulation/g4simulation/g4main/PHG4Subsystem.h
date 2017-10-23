@@ -3,6 +3,7 @@
 
 #include <fun4all/SubsysReco.h>
 
+#include <iostream>
 #include <string>
 
 class PHG4Detector;
@@ -21,8 +22,7 @@ overlapcheck(false)
   {}
 
   //! destructor
-  virtual ~PHG4Subsystem( void )
-  {}
+  virtual ~PHG4Subsystem( void ) {}
 
   //! event processing
   virtual int process_after_geant(PHCompositeNode *)
@@ -44,8 +44,10 @@ overlapcheck(false)
   virtual PHG4TrackingAction* GetTrackingAction( void ) const
   { return 0; }
 
-  virtual void OverlapCheck(const bool chk = true) {overlapcheck = chk;}
-    
+  void OverlapCheck(const bool chk = true) {overlapcheck = chk;}
+
+  bool CheckOverlap() const {return overlapcheck;}
+
  protected:
   bool overlapcheck;
 

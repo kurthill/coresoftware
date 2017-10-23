@@ -1,13 +1,14 @@
-#ifndef __PHG4TRUTHINFOCONTAINER_H__
-#define __PHG4TRUTHINFOCONTAINER_H__
+#ifndef PHG4TRUTHINFOCONTAINER_H__
+#define PHG4TRUTHINFOCONTAINER_H__
 
 #include <phool/PHObject.h>
+
 #include <map>
 #include <set>
 
-#include "PHG4Particle.h"
-#include "PHG4VtxPoint.h"
-#include "PHG4Shower.h"
+class PHG4Shower;
+class PHG4Particle;
+class PHG4VtxPoint;
 
 class PHG4TruthInfoContainer: public PHObject {
   
@@ -46,7 +47,7 @@ public:
   PHG4Particle* GetParticle(const int particleid);
   PHG4Particle* GetPrimaryParticle(const int particleid);
 
-  bool is_primary(const PHG4Particle* p) const {return (p->get_track_id() > 0);}
+  bool is_primary(const PHG4Particle* p) const;
   
   //! Get a range of iterators covering the entire container
   Range GetParticleRange() {return Range(particlemap.begin(),particlemap.end());}
@@ -70,14 +71,27 @@ public:
   int maxtrkindex() const;
   int mintrkindex() const;
 
+  //! Retrieve the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   std::pair< std::map<int,int>::const_iterator,
 	     std::map<int,int>::const_iterator > GetEmbeddedTrkIds() const {
     return std::make_pair(particle_embed_flags.begin(), particle_embed_flags.end());
   }
+
+  //! Set the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   void AddEmbededTrkId(const int id, const int flag) {
     particle_embed_flags.insert(std::make_pair(id,flag));
   }
 
+  //! Retrieve the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   int isEmbeded(const int trackid) const;
    
   // --- vertex storage --------------------------------------------------------
@@ -89,7 +103,7 @@ public:
   PHG4VtxPoint* GetVtx(const int vtxid);
   PHG4VtxPoint* GetPrimaryVtx(const int vtxid);
 
-  bool is_primary_vtx(const PHG4VtxPoint* v) const {return (v->get_id() > 0);}
+  bool is_primary_vtx(const PHG4VtxPoint* v) const;
   
   //! Get a range of iterators covering the entire vertex container
   VtxRange GetVtxRange() {return VtxRange(vtxmap.begin(),vtxmap.end());}
@@ -113,14 +127,27 @@ public:
   // returns the first primary vertex that was processed by Geant4
   int GetPrimaryVertexIndex() {return (vtxmap.lower_bound(1))->first;}
 
+  //! Retrieve the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   std::pair< std::map<int,int>::const_iterator,
 	     std::map<int,int>::const_iterator > GetEmbeddedVtxIds() const {
     return std::make_pair(vertex_embed_flags.begin(), vertex_embed_flags.end());
   }
+
+  //! Set the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   void AddEmbededVtxId(const int id, const int flag) {
     vertex_embed_flags.insert(std::make_pair(id,flag));
   }
 
+  //! Retrieve the embedding ID for the HepMC subevent or track to be analyzed.
+  //! positive ID is the embedded event of interest, e.g. jetty event from pythia
+  //! negative IDs are backgrounds, .e.g out of time pile up collisions
+  //! Usually, ID = 0 means the primary Au+Au collision background
   int isEmbededVtx(const int vtxid) const;
 
   // --- shower storage ------------------------------------------------------

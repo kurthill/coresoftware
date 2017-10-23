@@ -1,6 +1,19 @@
 #include "PHG4DstCompressReco.h"
 
+
+#include <g4main/PHG4TruthInfoContainer.h>
+#include <g4main/PHG4HitContainer.h>
+#include <g4main/PHG4Hit.h>
+#include <g4main/PHG4Particle.h>
+#include <g4main/PHG4Shower.h>
+
+#include <g4detectors/PHG4CellContainer.h>
+
+#include <g4cemc/RawTowerContainer.h>
+#include <g4cemc/RawTower.h>
+
 #include <fun4all/Fun4AllReturnCodes.h>
+
 #include <phool/PHCompositeNode.h>
 #include <phool/PHIODataNode.h>
 #include <phool/PHNodeIterator.h>
@@ -8,21 +21,13 @@
 #include <phool/PHNode.h>
 #include <phool/getClass.h>
 
-#include <g4main/PHG4TruthInfoContainer.h>
-#include <g4main/PHG4HitContainer.h>
-#include <g4main/PHG4Hit.h>
-#include <g4main/PHG4Particle.h>
-#include <g4detectors/PHG4CylinderCellContainer.h>
-#include <g4cemc/RawTowerContainer.h>
-#include <g4cemc/RawTower.h>
-
 #include <iostream>
 
 using namespace std;
 
 PHG4DstCompressReco::PHG4DstCompressReco(const string &name)
     : SubsysReco(name),
-      _truth_info(NULL),
+      _truth_info(nullptr),
       _compress_g4hit_names(),
       _compress_g4cell_names(),
       _g4cells(),
@@ -43,7 +48,7 @@ int PHG4DstCompressReco::InitRun(PHCompositeNode *topNode) {
        iter != _compress_g4cell_names.end(); ++iter) {
     std::string name = *iter;
 
-    PHG4CylinderCellContainer* g4cells = findNode::getClass<PHG4CylinderCellContainer>(topNode,name.c_str());
+    PHG4CellContainer* g4cells = findNode::getClass<PHG4CellContainer>(topNode,name.c_str());
     if (g4cells) {
       _g4cells.insert(g4cells);
     }    
@@ -68,10 +73,10 @@ int PHG4DstCompressReco::process_event(PHCompositeNode *topNode) {
 
   //---cells--------------------------------------------------------------------
   
-  for (std::set<PHG4CylinderCellContainer*>::iterator iter = _g4cells.begin();
+  for (std::set<PHG4CellContainer*>::iterator iter = _g4cells.begin();
        iter != _g4cells.end();
        ++iter) {
-    PHG4CylinderCellContainer* cells = *iter;
+    PHG4CellContainer* cells = *iter;
     cells->Reset(); // DROP ALL COMPRESSED G4CELLS
   }
 

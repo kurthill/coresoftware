@@ -1,29 +1,29 @@
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
-  -I`root-config --incdir` \
-  -I$(GENFIT)/include
+  -I`root-config --incdir`
 
 libgenfit2exp_la_LDFLAGS = \
   -nodefaultlibs \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
   `root-config --libs` \
-  -L$(GENFIT)/lib
+  -L$(GENFIT)/lib 
 
 lib_LTLIBRARIES = \
   libgenfit2exp.la
 
 pkginclude_HEADERS = \
-  fields/Field2D.h
+  Field.h
 
 libgenfit2exp_la_SOURCES = \
-  fields/Field2D.cc
+  Field.cc
 
 libgenfit2exp_la_LIBADD = \
-  -lgenfit2
+  -lgenfit2 \
+  -lphfield
 
 BUILT_SOURCES = \
   testexternals.C
@@ -40,12 +40,5 @@ testexternals.C:
 	echo "{" >> $@
 	echo "  return 0;" >> $@
 	echo "}" >> $@
-
-# Rule for generating CINT dictionaries from class headers.
-#%Dict.C: %.h %LinkDef.h
-#	rootcint -f $@ -c $(CINTFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $^
-
-#clean-local:
-#	rm -f *Dict*
 
 testexternals_SOURCES = testexternals.C

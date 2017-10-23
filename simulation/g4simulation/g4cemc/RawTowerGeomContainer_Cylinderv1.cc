@@ -1,19 +1,32 @@
 #include "RawTowerGeomContainer_Cylinderv1.h"
 
+#include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
-#include <cassert>
-
-ClassImp(RawTowerGeomContainer_Cylinderv1)
 
 using namespace std;
 
-RawTowerGeomContainer_Cylinderv1::RawTowerGeomContainer_Cylinderv1(
-    RawTowerDefs::CalorimeterId caloid) :
-    RawTowerGeomContainerv1(caloid), radius(NAN), thickness(NAN)
+RawTowerGeomContainer_Cylinderv1::RawTowerGeomContainer_Cylinderv1(RawTowerDefs::CalorimeterId caloid) :
+  RawTowerGeomContainerv1(caloid),
+  radius(NAN),
+  thickness(NAN)
 {
   return;
 }
+
+
+void
+RawTowerGeomContainer_Cylinderv1::Reset()
+{
+  eta_bound_map.clear();
+
+  phi_bound_map.clear();
+
+  RawTowerGeomContainerv1::Reset();
+}
+
+
 
 void
 RawTowerGeomContainer_Cylinderv1::set_etabins(const int i)
@@ -22,6 +35,7 @@ RawTowerGeomContainer_Cylinderv1::set_etabins(const int i)
   bound_t invalid_bound(NAN, NAN);
   eta_bound_map.resize(i, invalid_bound);
 }
+
 void
 RawTowerGeomContainer_Cylinderv1::set_phibins(const int i)
 {
@@ -41,20 +55,20 @@ RawTowerGeomContainer_Cylinderv1::identify(std::ostream& os) const
   for (bound_map_t::const_iterator iter = eta_bound_map.begin();
       iter != eta_bound_map.end(); ++iter)
     {
-      cout << "eta_bin[" << i << "](" << iter->first << ", " << iter->second
+      os << "eta_bin[" << i << "](" << iter->first << ", " << iter->second
           << ")  ";
       i++;
     }
-  cout << endl;
+  os << endl;
   i = 0;
   for (bound_map_t::const_iterator iter = phi_bound_map.begin();
       iter != phi_bound_map.end(); ++iter)
     {
-      cout << "phi_bin[" << i << "](" << iter->first << ", " << iter->second
+      os << "phi_bin[" << i << "](" << iter->first << ", " << iter->second
           << ")  ";
       i++;
     }
-  cout << endl;
+  os << endl;
   return;
 }
 

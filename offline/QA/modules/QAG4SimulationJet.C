@@ -1,4 +1,5 @@
 #include "QAG4SimulationJet.h"
+#include "QAHistManagerDef.h"
 
 #include <fun4all/SubsysReco.h>
 #include <fun4all/Fun4AllServer.h>
@@ -12,20 +13,20 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4Particle.h>
-#include <g4main/PHG4HitDefs.h>
+#include <g4main/PHG4Shower.h>
 
 #include <g4eval/JetEvalStack.h>
 #include <g4eval/JetTruthEval.h>
 
+#include <g4jets/JetMap.h>
+
 #include <TString.h>
 #include <TFile.h>
-#include <TMath.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 
-#include <exception>
 #include <stdexcept>
 #include <iostream>
 #include <vector>
@@ -34,7 +35,6 @@
 #include <cassert>
 #include <cmath>
 
-#include "QAHistManagerDef.h"
 
 using namespace std;
 
@@ -84,17 +84,13 @@ QAG4SimulationJet::InitRun(PHCompositeNode *topNode)
 
   if (flag(kProcessTruthSpectrum))
     {
-      for (set<string>::const_iterator it_reco_jets = _reco_jets.begin();
-          it_reco_jets != _reco_jets.end(); ++it_reco_jets)
-        {
-          if (not _jettrutheval)
-            _jettrutheval = shared_ptr < JetTruthEval
-                > (new JetTruthEval(topNode, _truth_jet));
+      if (not _jettrutheval)
+        _jettrutheval = shared_ptr < JetTruthEval
+            > (new JetTruthEval(topNode, _truth_jet));
 
-          assert(_jettrutheval);
-          _jettrutheval->set_strict(true);
-          _jettrutheval->set_verbosity(verbosity + 1);
-        }
+      assert(_jettrutheval);
+      _jettrutheval->set_strict(true);
+      _jettrutheval->set_verbosity(verbosity + 1);
     }
 
   return Fun4AllReturnCodes::EVENT_OK;
@@ -396,7 +392,7 @@ QAG4SimulationJet::process_Spectrum(PHCompositeNode *topNode,
           ));
   assert(iphi);
 
-  Jet* leading_jet = NULL;
+  Jet* leading_jet = nullptr;
   double max_et = 0;
   for (JetMap::Iter iter = jets->begin(); iter != jets->end(); ++iter)
     {
@@ -478,6 +474,17 @@ QAG4SimulationJet::process_Spectrum(PHCompositeNode *topNode,
           JetRecoEval* recoeval = eval_stack->get_reco_eval();
           assert(recoeval);
 
+          if (Verbosity()>=VERBOSITY_A_LOT)
+          {
+            cout << __PRETTY_FUNCTION__ << "Leading Jet " << jet_name << ": ";
+            //            leading_jet->identify();
+            cout << "CEMC_TOWER sum = " << recoeval->get_energy_contribution(leading_jet, Jet::CEMC_TOWER) << endl;
+            cout << "CEMC_CLUSTER sum = " << recoeval->get_energy_contribution(leading_jet, Jet::CEMC_CLUSTER) << endl;
+            cout << "HCALIN_TOWER sum = " << recoeval->get_energy_contribution(leading_jet, Jet::HCALIN_TOWER) << endl;
+            cout << "HCALIN_CLUSTER sum = " << recoeval->get_energy_contribution(leading_jet, Jet::HCALIN_CLUSTER) << endl;
+            cout << "leading_jet->get_e() = " << leading_jet->get_e() << endl;
+          }
+
           lcemcr->Fill( //
               (recoeval->get_energy_contribution(leading_jet, Jet::CEMC_TOWER) //
               +//
@@ -510,9 +517,17 @@ QAG4SimulationJet::process_Spectrum(PHCompositeNode *topNode,
           set<PHG4Shower*> showers = _jettrutheval->all_truth_showers(
               leading_jet);
 
+
           for (set<PHG4Shower*>::const_iterator it = showers.begin();
               it != showers.end(); ++it)
             {
+
+              if (Verbosity()>=VERBOSITY_A_LOT)
+              {
+                cout << __PRETTY_FUNCTION__ << "Leading Truth Jet shower : ";
+                (*it)->identify();
+              }
+
               cemc_e += (*it)->get_edep(
                   PHG4HitDefs::get_volume_id("G4HIT_CEMC"));
               cemc_e += (*it)->get_edep(
@@ -530,7 +545,44 @@ QAG4SimulationJet::process_Spectrum(PHCompositeNode *topNode,
                   PHG4HitDefs::get_volume_id("G4HIT_BH_FORWARD_PLUS"));
               bh_e += (*it)->get_edep(
                   PHG4HitDefs::get_volume_id("G4HIT_BH_FORWARD_NEG"));
+
+              if (Verbosity() >= VERBOSITY_A_LOT)
+              {
+                //            leading_jet->identify();
+                cout << "Shower cemc_e sum = "
+                     << (*it)->get_edep(PHG4HitDefs::get_volume_id("G4HIT_CEMC"))
+                     << " + "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_CEMC_ELECTRONICS"))
+                     << " + "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_ABSORBER_CEMC"))
+                     << endl;
+                cout << "Shower hcalin_e sum = "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_HCALIN"))
+                     << " + "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_ABSORBER_HCALIN"))
+                     << endl;
+                cout << "Shower bh_e sum = "
+                     << (*it)->get_edep(PHG4HitDefs::get_volume_id("G4HIT_BH_1"))
+                     << " + "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_BH_FORWARD_PLUS"))
+                     << " + "
+                     << (*it)->get_edep(
+                            PHG4HitDefs::get_volume_id("G4HIT_BH_FORWARD_NEG"))
+                     << endl;
+              }
             }
+
+          if (Verbosity() >= VERBOSITY_A_LOT)
+          {
+            cout << "cemc_e sum = " << cemc_e << endl;
+            cout << "hcalin_e sum = " <<hcalin_e<< endl;
+            cout << "leading_jet->get_e() = " << leading_jet->get_e() << endl;
+          }
 
           lcemcr->Fill(cemc_e / leading_jet->get_e());
           lemchcalr->Fill((cemc_e + hcalin_e) / leading_jet->get_e());
@@ -654,7 +706,7 @@ QAG4SimulationJet::process_TruthMatching(PHCompositeNode *topNode,
     }
 
   // search for leading truth
-  Jet* truthjet = NULL;
+  Jet* truthjet = nullptr;
   double max_et = 0;
   for (JetMap::Iter iter = truthjets->begin(); iter != truthjets->end(); ++iter)
     {
@@ -783,7 +835,7 @@ QAG4SimulationJet::process_TruthMatching(PHCompositeNode *topNode,
     }
 
   // search for leading reco jet
-  Jet* recojet = NULL;
+  Jet* recojet = nullptr;
   max_et = 0;
   for (JetMap::Iter iter = recojets->begin(); iter != recojets->end(); ++iter)
     {

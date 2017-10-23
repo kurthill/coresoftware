@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
   -I`root-config --incdir` \
@@ -21,18 +21,21 @@ pkginclude_HEADERS = \
   Measurement.h \
   PlanarMeasurement.h \
   SpacepointMeasurement.h \
-  Track.h
+  Track.h \
+  Tools.h
 
 libPHGenFit_la_SOURCES = \
   Fitter.cc \
   Measurement.cc \
   PlanarMeasurement.cc \
   SpacepointMeasurement.cc \
-  Track.cc
+  Track.cc \
+  Tools.cc
 
 libPHGenFit_la_LIBADD = \
   -lgenfit2 \
-  -lgenfit2exp
+  -lgenfit2exp \
+  -lphfield
 
 BUILT_SOURCES = \
   testexternals.C
@@ -49,12 +52,5 @@ testexternals.C:
 	echo "{" >> $@
 	echo "  return 0;" >> $@
 	echo "}" >> $@
-
-# Rule for generating CINT dictionaries from class headers.
-#%Dict.C: %.h %LinkDef.h
-#	rootcint -f $@ -c $(CINTFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $^
-
-#clean-local:
-#	rm -f *Dict*
 
 testexternals_SOURCES = testexternals.C

@@ -1,19 +1,15 @@
 #include "RawTowerGeomContainerv1.h"
 #include "RawTowerGeom.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
-#include <cassert>
-
-ClassImp(RawTowerGeomContainerv1)
 
 using namespace std;
 
-RawTowerGeomContainerv1::RawTowerGeomContainerv1(
-    RawTowerDefs::CalorimeterId caloid)
-{
-  _caloid = caloid;
-}
+RawTowerGeomContainerv1::RawTowerGeomContainerv1(RawTowerDefs::CalorimeterId caloid):
+  _caloid(caloid)
+{}
 
 RawTowerGeomContainerv1::~RawTowerGeomContainerv1()
 {
@@ -84,11 +80,13 @@ RawTowerGeomContainerv1::isValid() const
 void
 RawTowerGeomContainerv1::Reset()
 {
+
   while (_geoms.begin() != _geoms.end())
     {
       delete _geoms.begin()->second;
       _geoms.erase(_geoms.begin());
     }
+
 }
 
 void

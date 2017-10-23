@@ -12,8 +12,6 @@
 #include <phool/getClass.h>
 
 
-#include <boost/tuple/tuple.hpp>
-
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -29,10 +27,10 @@ static PHG4ScintillatorSlat *slatarray[ROWDIM][COLUMNDIM];
 PHG4Prototype2HcalCellReco::PHG4Prototype2HcalCellReco(const string &name) :
   SubsysReco(name),
   _timer(PHTimeServer::get()->insert_new(name.c_str())),
-  nslatscombined(1),
-  chkenergyconservation(0), timing_window_size(numeric_limits<double>::max())
+  chkenergyconservation(0),
+  tmin(0.0),  // ns
+  tmax(60.0) // ns
 {
-  memset(nbins, 0, sizeof(nbins));
   memset(slatarray, 0, sizeof(slatarray));
 }
 
@@ -102,10 +100,8 @@ PHG4Prototype2HcalCellReco::process_event(PHCompositeNode *topNode)
       PHG4HitContainer::ConstRange hit_begin_end = g4hit->getHits(*layer);
       for (hiter = hit_begin_end.first; hiter != hit_begin_end.second; ++hiter)
 	{
-	  if (hiter->second->get_t(0)>timing_window_size)
-	    {
-	      continue;
-	    }
+	  if (hiter->second->get_t(0)>tmax) continue;
+	  if (hiter->second->get_t(1)<tmin) continue;
 	  short icolumn = hiter->second->get_scint_id();
 	  short irow = hiter->second->get_row();
 	  if ( irow >= ROWDIM || irow < 0)

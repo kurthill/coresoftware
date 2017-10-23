@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-ClassImp(PHG4CylinderGeom_Spacalv2)
-
 using namespace std;
 
 PHG4CylinderGeom_Spacalv2::PHG4CylinderGeom_Spacalv2()
@@ -76,7 +74,7 @@ PHG4CylinderGeom_Spacalv2::SetDefault()
   polar_taper_ratio = 1 + 1.1 / 42.;
   assembly_spacing = 0.0001; // order ~1um clearance around all structures
 
-  init_default_sector_map();
+//  init_default_sector_map();
 
 }
 
@@ -125,10 +123,10 @@ PHG4CylinderGeom_Spacalv2::get_half_polar_taper_angle() const
 int
 PHG4CylinderGeom_Spacalv2::get_azimuthal_n_sec() const
 {
-  if (config == kNonProjective)
-    //For kNonProjective geometry, azimuthal_n_sec is calculated, and can not be set externally
-    return PHG4CylinderGeom_Spacalv1::get_azimuthal_n_sec();
-  else
+//  if (config == kNonProjective)
+//    //For kNonProjective geometry, azimuthal_n_sec is calculated, and can not be set externally
+//    return PHG4CylinderGeom_Spacalv1::get_azimuthal_n_sec();
+//  else
     return azimuthal_n_sec;
 }
 
@@ -145,7 +143,7 @@ PHG4CylinderGeom_Spacalv2::set_azimuthal_n_sec(int azimuthalNSec)
     }
 
   azimuthal_n_sec = azimuthalNSec;
-  init_default_sector_map();
+//  init_default_sector_map();
 }
 
 bool

@@ -26,9 +26,9 @@ using namespace std;
 //_______________________________________________________________________
 PHG4TruthSubsystem::PHG4TruthSubsystem( const string &name ):
   PHG4Subsystem( name ),
-  eventAction_( 0 ),
-  steppingAction_( 0 ),
-  trackingAction_( 0 ),
+  eventAction_( NULL ),
+  steppingAction_( NULL ),
+  trackingAction_( NULL ),
   saveOnlyEmbeded_(false)
 {}
 
@@ -108,7 +108,7 @@ int PHG4TruthSubsystem::process_after_geant(PHCompositeNode * topNode)
       while (truthiter != truth_range.second)
         {
           const int primary_id = (truthiter->second)->get_primary_id();
-          if (truthInfoList->isEmbeded(primary_id) == 0)
+          if (truthInfoList->isEmbeded(primary_id) <= 0)
             {
               // not a embed associated particle
 

@@ -1,13 +1,10 @@
 #include "PHG4CylinderCellContainer.h"
-#include "PHG4CylinderCell.h"
 #include "PHG4CylinderCellv1.h"
 #include "PHG4CylinderCellDefs.h"
 
 #include <cstdlib>
 
 using namespace std;
-
-ClassImp(PHG4CylinderCellContainer)
 
 PHG4CylinderCellContainer::PHG4CylinderCellContainer()
 {

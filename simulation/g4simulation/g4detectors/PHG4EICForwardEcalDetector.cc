@@ -1,4 +1,3 @@
-#include "PHG4ForwardEcalDetector.h"
 #include "PHG4EICForwardEcalDetector.h"
 #include "PHG4CylinderGeomContainer.h"
 #include "PHG4CylinderGeomv3.h"
@@ -234,7 +233,7 @@ PHG4EICForwardEcalDetector::PlaceTower(G4LogicalVolume* ecalenvelope, G4LogicalV
   /* Loop over all tower positions in vector and place tower */
   typedef std::map< std::string, towerposition>::iterator it_type;
 
-  for(it_type iterator = _map_tower.begin(); iterator != _map_tower.end(); iterator++) {
+  for(it_type iterator = _map_tower.begin(); iterator != _map_tower.end(); ++iterator) {
 
       if ( verbosity > 0 )
 	{

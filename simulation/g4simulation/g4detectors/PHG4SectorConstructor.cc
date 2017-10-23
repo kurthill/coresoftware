@@ -1,5 +1,3 @@
-// $Id: PHG4SectorConstructor.cc,v 1.6 2014/07/31 15:52:37 jinhuang Exp $
-
 /*!
  * \file PHG4SectorConstructor.cc
  * \brief 
@@ -10,31 +8,31 @@
 
 #include "PHG4SectorConstructor.h"
 
-#include "Geant4/G4Material.hh"
-#include "Geant4/G4MaterialTable.hh"
-#include "Geant4/G4Element.hh"
-#include "Geant4/G4ProductionCuts.hh"
-#include "Geant4/G4ElementTable.hh"
-#include "Geant4/G4Box.hh"
-#include "Geant4/G4Tubs.hh"
-#include "Geant4/G4LogicalVolume.hh"
-#include "Geant4/G4ThreeVector.hh"
-#include "Geant4/G4PVPlacement.hh"
-#include "Geant4/G4SDManager.hh"
-#include "Geant4/G4VisAttributes.hh"
-#include "Geant4/G4Colour.hh"
+#include <Geant4/G4Material.hh>
+#include <Geant4/G4MaterialTable.hh>
+#include <Geant4/G4Element.hh>
+#include <Geant4/G4ProductionCuts.hh>
+#include <Geant4/G4ElementTable.hh>
+#include <Geant4/G4Box.hh>
+#include <Geant4/G4Tubs.hh>
+#include <Geant4/G4LogicalVolume.hh>
+#include <Geant4/G4ThreeVector.hh>
+#include <Geant4/G4PVPlacement.hh>
+#include <Geant4/G4SDManager.hh>
+#include <Geant4/G4VisAttributes.hh>
+#include <Geant4/G4Colour.hh>
 
-#include "Geant4/G4NistManager.hh"
+#include <Geant4/G4NistManager.hh>
 
-#include "Geant4/G4Ellipsoid.hh"
-#include "Geant4/G4Sphere.hh"
-#include "Geant4/G4Orb.hh"
-#include "Geant4/G4Cons.hh"
-#include "Geant4/G4DisplacedSolid.hh"
-#include "Geant4/G4ExtrudedSolid.hh"
-#include "Geant4/G4IntersectionSolid.hh"
-#include "Geant4/G4UnionSolid.hh"
-#include "Geant4/G4SubtractionSolid.hh"
+#include <Geant4/G4Ellipsoid.hh>
+#include <Geant4/G4Sphere.hh>
+#include <Geant4/G4Orb.hh>
+#include <Geant4/G4Cons.hh>
+#include <Geant4/G4DisplacedSolid.hh>
+#include <Geant4/G4ExtrudedSolid.hh>
+#include <Geant4/G4IntersectionSolid.hh>
+#include <Geant4/G4UnionSolid.hh>
+#include <Geant4/G4SubtractionSolid.hh>
 
 #include <cassert>
 #include <cmath>
@@ -48,7 +46,7 @@ PHG4SectorConstructor::PHG4SectorConstructor(std::string name) :
     name_base(name), DetectorVisAtt(NULL)
 {
   // TODO Auto-generated constructor stub
-
+  overlapcheck_sector = false;
 }
 
 PHG4SectorConstructor::~PHG4SectorConstructor()
@@ -59,7 +57,6 @@ PHG4SectorConstructor::~PHG4SectorConstructor()
 void
 PHG4SectorConstructor::Construct_Sectors(G4LogicalVolume* WorldLog)
 {
-
 // geometry checks
   if (geom.get_total_thickness() == 0)
     {
@@ -182,12 +179,11 @@ PHG4SectorConstructor::Construct_Sectors(G4LogicalVolume* WorldLog)
 
   for (G4int sec = 0; sec < geom.get_N_Sector(); sec++)
     {
-
       RegisterPhysicalVolume(
           new G4PVPlacement(
               G4RotateZ3D(2 * pi / geom.get_N_Sector() * sec)
                   * transform_Det_to_Hall, DetectorLog_Det,
-              name_base + "_Physical", WorldLog, false, sec));
+              name_base + "_Physical", WorldLog, false, sec,overlapcheck_sector));
     }
 
   // construct layers
@@ -222,7 +218,7 @@ PHG4SectorConstructor::Construct_Sectors(G4LogicalVolume* WorldLog)
 
       RegisterPhysicalVolume(
           new G4PVPlacement(0, G4ThreeVector(), LayerLog_Det,
-              layer_name + "_Physical", DetectorLog_Det, false, 0), l.active);
+			    layer_name + "_Physical", DetectorLog_Det, false, 0,overlapcheck_sector), l.active);
 
       z_start += l.depth;
     }

@@ -3,6 +3,7 @@
 #include <g4main/PHG4HitContainer.h>
 #include <g4main/PHG4Hit.h>
 #include <g4main/PHG4Hitv1.h>
+#include <g4main/PHG4Shower.h>
 #include <g4main/PHG4TrackUserInfoV1.h>
 
 #include <phool/getClass.h>
@@ -13,7 +14,8 @@
 using namespace std;
 
 
-PHG4FCalSteppingAction::PHG4FCalSteppingAction( PHG4FCalDetector* detector ) : detector_( detector )
+PHG4FCalSteppingAction::PHG4FCalSteppingAction( PHG4FCalDetector* detector ) :
+    detector_( detector ), hits_(NULL), hit(NULL)
 {
   
 }

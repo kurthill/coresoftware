@@ -15,6 +15,7 @@ class PHG4Hit: public PHObject
   virtual void identify(std::ostream& os = std::cout) const;
   virtual void Copy(PHG4Hit const &g4hit);
   friend std::ostream &operator<<(std::ostream & stream, const PHG4Hit * hit);
+  virtual void Reset();
 
   // The indices here represent the entry and exit points of the particle
   virtual float get_x(const int i) const {return NAN;}
@@ -23,6 +24,9 @@ class PHG4Hit: public PHObject
   virtual float get_px(const int i) const {return NAN;}
   virtual float get_py(const int i) const {return NAN;}
   virtual float get_pz(const int i) const {return NAN;}
+  virtual float get_local_x(const int i) const {return NAN;}
+  virtual float get_local_y(const int i) const {return NAN;}
+  virtual float get_local_z(const int i) const {return NAN;}
   virtual float get_t(const int i) const {return NAN;}
   virtual float get_edep() const {return NAN;}
   virtual float get_eion() const {return NAN;}
@@ -30,6 +34,7 @@ class PHG4Hit: public PHObject
   virtual float get_path_length() const {return NAN;}
   virtual unsigned int get_layer() const {return UINT_MAX;}
   virtual PHG4HitDefs::keytype get_hit_id() const {return ULONG_LONG_MAX;}
+  virtual int get_detid() const {return INT_MIN;}
   virtual int get_shower_id() const {return INT_MIN;}
   virtual int get_scint_id() const {return INT_MIN;}
   virtual int get_row() const {return INT_MIN;}
@@ -42,6 +47,7 @@ class PHG4Hit: public PHObject
   virtual int get_index_j() const {return INT_MIN;}
   virtual int get_index_k() const {return INT_MIN;}
   virtual int get_index_l() const {return INT_MIN;}
+  virtual int get_hit_type() const {return INT_MIN;}
 
   virtual void set_x(const int i, const float f) {return;}
   virtual void set_y(const int i, const float f) {return;}
@@ -49,6 +55,9 @@ class PHG4Hit: public PHObject
   virtual void set_px(const int i, const float f) {return;}
   virtual void set_py(const int i, const float f) {return;}
   virtual void set_pz(const int i, const float f) {return;}
+  virtual void set_local_x(const int i, const float f) {return;}
+  virtual void set_local_y(const int i, const float f) {return;}
+  virtual void set_local_z(const int i, const float f) {return;}
   virtual void set_t(const int i, const float f) {return;}
   virtual void set_edep(const float f) {return;}
   virtual void set_eion(const float f) {return;}
@@ -68,6 +77,7 @@ class PHG4Hit: public PHObject
   virtual void set_index_j(const int i) {return;}
   virtual void set_index_k(const int i) {return;}
   virtual void set_index_l(const int i) {return;}
+  virtual void set_hit_type(const int i) {return;}
 
   virtual float get_avg_x() const;
   virtual float get_avg_y() const;
@@ -77,7 +87,9 @@ class PHG4Hit: public PHObject
   virtual void print() const {std::cout<<"PHG4Hit base class - print() not implemented"<<std::endl;}
 
 
-  //! add a short name to PHG4Hit::get_property_name
+  //! Procedure to add a new PROPERTY tag:
+  //! 1.add new tag below with unique value,
+  //! 2.add a short name to PHG4Hit::get_property_info
   enum PROPERTY 
   {//
 
@@ -101,6 +113,14 @@ class PHG4Hit: public PHObject
     //! pathlength
     prop_path_length = 16,
 
+    //! local coordinate
+    prop_local_x_0 = 20,
+    prop_local_x_1 = 21,
+    prop_local_y_0 = 22,
+    prop_local_y_1 = 23,
+    prop_local_z_0 = 24,
+    prop_local_z_1 = 25,
+
     //-- detector specific IDs: 100+ --
 
     //! layer ID
@@ -116,13 +136,28 @@ class PHG4Hit: public PHObject
     prop_ladder_z_index = 112,
     prop_ladder_phi_index = 113,
 
+    // MAPS stuff 
+    prop_stave_index = 114,
+    prop_half_stave_index = 115,
+    prop_module_index = 116,
+    prop_chip_index = 117,
+
+    prop_local_pos_x_0 = 118,
+    prop_local_pos_y_0 = 119,
+    prop_local_pos_z_0 = 120,
+
     //! generic indexes
     prop_index_i = 121,
     prop_index_j = 122,
     prop_index_k = 123,
     prop_index_l = 124,
 
+    //! hit type
+    prop_hit_type = 125,
 
+    prop_local_pos_x_1 = 128,
+    prop_local_pos_y_1 = 126,
+    prop_local_pos_z_1 = 127,
 
     //! max limit in order to fit into 8 bit unsigned number
     prop_MAX_NUMBER = UCHAR_MAX

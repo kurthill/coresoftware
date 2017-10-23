@@ -20,8 +20,7 @@ class PHG4PhenixDetector: public G4VUserDetectorConstruction
   PHG4PhenixDetector();
 
   //! destructor
-  virtual ~PHG4PhenixDetector()
-  {}
+  virtual ~PHG4PhenixDetector();
 
   void Verbosity(int verb) {verbosity = verb;}
   
@@ -46,6 +45,7 @@ class PHG4PhenixDetector: public G4VUserDetectorConstruction
 
   void SetWorldShape(const std::string &s) {worldshape = s;}
   void SetWorldMaterial(const std::string &s) {worldmaterial = s;}
+  G4VPhysicalVolume* GetPhysicalVolume(void) {return physiWorld;}
 
   protected:
 

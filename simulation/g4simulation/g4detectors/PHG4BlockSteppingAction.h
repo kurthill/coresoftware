@@ -1,44 +1,47 @@
 #ifndef PHG4VBlockSteppingAction_h
 #define PHG4VBlockSteppingAction_h
 
-#include "g4main/PHG4SteppingAction.h"
+#include <g4main/PHG4SteppingAction.h>
 
+class G4VPhysicalVolume;
 class PHG4BlockDetector;
 class PHG4Hit;
 class PHG4HitContainer;
+class PHG4Parameters;
+class PHG4Shower;
 
 class PHG4BlockSteppingAction : public PHG4SteppingAction
 {
-
-  public:
-
+ public:
   //! constructor
-  PHG4BlockSteppingAction( PHG4BlockDetector* );
+  PHG4BlockSteppingAction(PHG4BlockDetector *, const PHG4Parameters *parameters);
 
-  //! destroctor
-  virtual ~PHG4BlockSteppingAction()
-  {}
+  //! destructor
+  virtual ~PHG4BlockSteppingAction();
 
   //! stepping action
-  virtual bool UserSteppingAction(const G4Step*, bool);
+  virtual bool UserSteppingAction(const G4Step *, bool);
 
   //! reimplemented from base class
-  virtual void SetInterfacePointers( PHCompositeNode* );
-  void UseG4Steps(const int i = 1) {use_g4_steps = i;}
-  void UseIonizationEnergy(const int i) {use_ionisation_energy = i;}
+  virtual void SetInterfacePointers(PHCompositeNode *);
 
-  private:
-
+ private:
   //! pointer to the detector
-  PHG4BlockDetector* detector_;
-
+  PHG4BlockDetector *detector_;
+  const PHG4Parameters *params;
   //! pointer to hit container
-  PHG4HitContainer * hits_;
+  PHG4HitContainer *hits_;
   PHG4Hit *hit;
+  PHG4Shower *saveshower;
+  G4VPhysicalVolume *savevolpre;
+  G4VPhysicalVolume *savevolpost;
+  int savetrackid;
+  int saveprestepstatus;
+  int savepoststepstatus;
+  int active;
+  int IsBlackHole;
 
   int use_g4_steps;
-  int use_ionisation_energy;
 };
 
-
-#endif //__G4PHPHYTHIAREADER_H__
+#endif  //__G4PHPHYTHIAREADER_H__

@@ -1,45 +1,56 @@
-#ifndef PHG4VCylinderSteppingAction_h
-#define PHG4VCylinderSteppingAction_h
+#ifndef PHG4CylinderSteppingAction_h
+#define PHG4CylinderSteppingAction_h
 
-#include "g4main/PHG4SteppingAction.h"
+#include <g4main/PHG4SteppingAction.h>
+
 #include <string>
 
+class G4VPhysicalVolume;
 class PHG4CylinderDetector;
 class PHG4Hit;
 class PHG4HitContainer;
+class PHG4Shower;
+class PHG4Parameters;
 
 class PHG4CylinderSteppingAction : public PHG4SteppingAction
 {
-
-  public:
-
+ public:
   //! constructor
-  PHG4CylinderSteppingAction( PHG4CylinderDetector* );
+  PHG4CylinderSteppingAction(PHG4CylinderDetector *, const PHG4Parameters *parameters);
 
-  //! destroctor
-  virtual ~PHG4CylinderSteppingAction()
-  {}
+  //! destructor
+  virtual ~PHG4CylinderSteppingAction();
 
   //! stepping action
-  virtual bool UserSteppingAction(const G4Step*, bool);
+  bool UserSteppingAction(const G4Step *, bool);
 
   //! reimplemented from base class
-  virtual void SetInterfacePointers( PHCompositeNode* );
+  void SetInterfacePointers(PHCompositeNode *);
 
-  void set_zmin(const float z) {zmin = z;}
-  void set_zmax(const float z) {zmax = z;}
-
-  private:
-
+  void SaveLightYield(const int i = 1) { save_light_yield = i; }
+ private:
   //! pointer to the detector
-  PHG4CylinderDetector* detector_;
+  PHG4CylinderDetector *detector_;
+
+  const PHG4Parameters *params;
 
   //! pointer to hit container
-  PHG4HitContainer * hits_;
+  PHG4HitContainer *hits_;
   PHG4Hit *hit;
-  float zmin;
-  float zmax;
+  PHG4Shower *saveshower;
+  G4VPhysicalVolume *savevolpre;
+  G4VPhysicalVolume *savevolpost;
+  int save_light_yield;
+  int savetrackid;
+  int saveprestepstatus;
+  int savepoststepstatus;
+  int active;
+  int IsBlackHole;
+  int use_g4_steps;
+  double zmin;
+  double zmax;
+  double tmin;
+  double tmax;
 };
 
-
-#endif //__G4PHPHYTHIAREADER_H__
+#endif

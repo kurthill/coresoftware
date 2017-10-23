@@ -7,6 +7,7 @@
  */
 
 #include "PHG4SteppingAction.h"
+#include "PHG4Hit.h"
 
 #include <Geant4/G4Step.hh>
 #include <Geant4/G4Material.hh>
@@ -14,8 +15,16 @@
 #include <Geant4/G4Track.hh>
 #include <Geant4/G4LossTableManager.hh>
 #include <Geant4/G4SystemOfUnits.hh>
+#include <Geant4/G4StepPoint.hh>
+#include <Geant4/G4TouchableHandle.hh>
+#include <Geant4/G4ThreeVector.hh>
+#include <Geant4/G4NavigationHistory.hh>
+
+
 
 #include <iostream>
+#include <cassert>
+
 using namespace std;
 
 double
@@ -104,4 +113,63 @@ PHG4SteppingAction::GetVisibleEnergyDeposition(const G4Step* step)
 
       return 0;
     }
+}
+
+void
+PHG4SteppingAction::StoreLocalCoordinate(PHG4Hit * hit, const G4Step* aStep,
+    const bool do_prepoint, const bool do_postpoint)
+{
+  assert(hit);
+  assert(aStep);
+
+  G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
+  G4TouchableHandle theTouchable = preStepPoint->GetTouchableHandle();
+
+  if (do_prepoint)
+    {
+
+      G4ThreeVector worldPosition = preStepPoint->GetPosition();
+      G4ThreeVector localPosition =
+          theTouchable->GetHistory()->GetTopTransform().TransformPoint(
+              worldPosition);
+
+      hit->set_local_x(0, localPosition.x() / cm);
+      hit->set_local_y(0, localPosition.y() / cm);
+      hit->set_local_z(0, localPosition.z() / cm);
+    }
+  if (do_postpoint)
+    {
+      G4StepPoint * postPoint = aStep->GetPostStepPoint();
+
+      G4ThreeVector worldPosition = postPoint->GetPosition();
+      G4ThreeVector localPosition =
+          theTouchable->GetHistory()->GetTopTransform().TransformPoint(
+              worldPosition);
+
+      hit->set_local_x(1, localPosition.x() / cm);
+      hit->set_local_y(1, localPosition.y() / cm);
+      hit->set_local_z(1, localPosition.z() / cm);
+    }
+
+}
+
+bool
+PHG4SteppingAction::IntOptExist(const std::string &name)
+{
+  if (opt_int.find(name) != opt_int.end())
+    {
+      return true;
+    }
+  return false;
+}
+
+int
+PHG4SteppingAction::GetIntOpt(const std::string &name)
+{
+  if (IntOptExist(name))
+    {
+      return opt_int.find(name)->second;
+    }
+  cout << "option " << name << " does not exist" << endl;
+  exit(1);
 }

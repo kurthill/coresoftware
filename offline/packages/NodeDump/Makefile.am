@@ -5,7 +5,10 @@ BUILT_SOURCES = \
 
 lib_LTLIBRARIES = libphnodedump.la
 
-INCLUDES = -I$(includedir) -I$(OFFLINE_MAIN)/include -I$(ROOTSYS)/include
+AM_CPPFLAGS = \
+  -I$(includedir) \
+  -I$(OFFLINE_MAIN)/include \
+  -I$(ROOTSYS)/include
 
 pkginclude_HEADERS = \
   PHNodeDump.h \
@@ -13,16 +16,29 @@ pkginclude_HEADERS = \
 
 libphnodedump_la_SOURCES = \
   Dumper.cc \
+  DumpBbcVertexMap.cc \
+  DumpGlobalVertexMap.cc \
+  DumpJetMap.cc \
+  DumpPdbParameterMap.cc \
+  DumpPdbParameterMapContainer.cc \
+  DumpPHG4BlockGeomContainer.cc \
+  DumpPHG4BlockCellGeomContainer.cc \
+  DumpPHG4CellContainer.cc \
   DumpPHG4CylinderCellContainer.cc \
   DumpPHG4CylinderCellGeomContainer.cc \
   DumpPHG4CylinderGeomContainer.cc \
   DumpPHG4HitContainer.cc \
+  DumpPHG4ScintillatorSlatContainer.cc \
   DumpPHG4TruthInfoContainer.cc \
   DumpPHG4InEvent.cc \
   DumpRawClusterContainer.cc \
   DumpRawTowerContainer.cc \
   DumpRawTowerGeomContainer.cc \
   DumpRunHeader.cc \
+  DumpSvtxClusterMap.cc \
+  DumpSvtxHitMap.cc \
+  DumpSvtxTrackMap.cc \
+  DumpSvtxVertexMap.cc \
   DumpSyncObject.cc \
   DumpVariableArray.cc \
   DumpObject.cc \
@@ -32,15 +48,20 @@ libphnodedump_la_SOURCES = \
 AM_LDFLAGS = -L$(libdir) -L$(OFFLINE_MAIN)/lib
 
 libphnodedump_la_LIBADD = \
+  -lg4bbc_io \
   -lcemc \
   -lffaobjects \
   -lg4detectors \
+  -lg4hough_io \
+  -lg4jets_io \
   -lg4testbench \
   -lphg4hit \
   -lvararray
 
 noinst_PROGRAMS = \
   testexternals
+
+testexternals_SOURCES = testexternals.cc
 
 testexternals_LDADD = \
   libphnodedump.la
@@ -56,9 +77,7 @@ PHNodeDumpDict.cc : \
   PHNodeDump.h \
   Dumper.h \
   PHNodeDumpLinkDef.h
-	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(INCLUDES) $^
+	rootcint -f $@ @CINTDEFS@ -c $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $^
 
 clean-local:
 	rm -f *Dict*
-
-testexternals_SOURCES = testexternals.cc

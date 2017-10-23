@@ -9,8 +9,8 @@ G4CONFIG     := geant4-config
 G4CFLAGS     := $(shell $(G4CONFIG) --cflags) 
 G4LDFLAGS    := $(shell $(G4CONFIG) --libs)
 
-GENFITCFLAGS	:=	-I$(GENFIT)/include
-GENFITLDFLAGS	:=	-L$(GENFIT)/lib -lgenfit2
+#GENFITCFLAGS	:=	-I$(GENFIT)/include
+#GENFITLDFLAGS	:=	-L$(GENFIT)/lib -lgenfit2
 
 CXX           = c++ -g
 CXXFLAGS      = -O3 -Wall -fPIC
@@ -28,11 +28,13 @@ LDFLAGS      += $(ROOTLDFLAGS) $(ROOTGLIBS) ${ROOTLIBS}
 #CXXFLAGS     += $(GENFITCFLAGS)
 #LDFLAGS      += $(GENFITLDFLAGS)
 
-CXXFLAGS	+=	-I$(OFFLINE_MAIN)/include
-LDFLAGS		+=	-L$(OFFLINE_MAIN)/lib -lgenfit2exp -lPHGenFit
-
 CXXFLAGS	+=	-I$(MY_INSTALL)/include
-LDFLAGS		+=	-L$(MY_INSTALL)/lib -lgenfit2exp -lPHGenFit
+LDFLAGS		+=	-L$(MY_INSTALL)/lib -lgenfit2exp -lPHGenFit  \
+  -lphfield
+
+CXXFLAGS	+=	-I$(OFFLINE_MAIN)/include
+LDFLAGS		+=	-L$(OFFLINE_MAIN)/lib -lgenfit2exp -lPHGenFit \
+  -lphfield
 
 TESTO         = testPHGenFit.o
 TEST	        = testPHGenFit

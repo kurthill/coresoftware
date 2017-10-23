@@ -46,6 +46,10 @@ std::vector<Jet*> TowerJetInput::get_input(PHCompositeNode *topNode) {
 
   GlobalVertexMap* vertexmap = findNode::getClass<GlobalVertexMap>(topNode,"GlobalVertexMap");
   if (!vertexmap) {
+
+    cout <<"TowerJetInput::get_input - Fatal Error - GlobalVertexMap node is missing. Please turn on the do_global flag in the main macro in order to reconstruct the global vertex."<<endl;
+    assert(vertexmap); // force quit
+
     return std::vector<Jet*>();
   }
 
@@ -81,6 +85,24 @@ std::vector<Jet*> TowerJetInput::get_input(PHCompositeNode *topNode) {
     if (!towers||!geom) {
       return std::vector<Jet*>();
     }
+  } else if (_input == Jet::CEMC_TOWER_SUB1) {
+    towers = findNode::getClass<RawTowerContainer>(topNode,"TOWER_CALIB_CEMC_RETOWER_SUB1");
+    geom = findNode::getClass<RawTowerGeomContainer>(topNode,"TOWERGEOM_HCALIN");
+    if (!towers||!geom) {
+      return std::vector<Jet*>();
+    }
+  } else if (_input == Jet::HCALIN_TOWER_SUB1) {
+    towers = findNode::getClass<RawTowerContainer>(topNode,"TOWER_CALIB_HCALIN_SUB1");
+    geom = findNode::getClass<RawTowerGeomContainer>(topNode,"TOWERGEOM_HCALIN");
+    if (!towers||!geom) {
+      return std::vector<Jet*>();
+    }
+  } else if (_input == Jet::HCALOUT_TOWER_SUB1) {
+    towers = findNode::getClass<RawTowerContainer>(topNode,"TOWER_CALIB_HCALOUT_SUB1");
+    geom = findNode::getClass<RawTowerGeomContainer>(topNode,"TOWERGEOM_HCALOUT");
+    if (!towers||!geom) {
+      return std::vector<Jet*>();
+    }
   } else {
     return std::vector<Jet*>();
   }
@@ -90,6 +112,19 @@ std::vector<Jet*> TowerJetInput::get_input(PHCompositeNode *topNode) {
   float vtxz = NAN;
   if (vtx) vtxz = vtx->get_z();
   else return std::vector<Jet*>();
+
+  if (isnan(vtxz))
+    {
+      static bool once = true;
+      if (once)
+        {
+          once = false;
+
+          cout <<"TowerJetInput::get_input - WARNING - vertex is NAN. Drop all tower inputs (further NAN-vertex warning will be suppressed)."<<endl;
+        }
+
+      return std::vector<Jet*>();
+    }
 
   std::vector<Jet*> pseudojets;
   RawTowerContainer::ConstRange begin_end = towers->getTowers();
@@ -108,7 +143,7 @@ std::vector<Jet*> TowerJetInput::get_input(PHCompositeNode *topNode) {
     double z = z0 - vtxz;
     
     double eta = asinh(z/r); // eta after shift from vertex
-    
+
     double pt = tower->get_energy() / cosh(eta);
     double px = pt * cos(phi);
     double py = pt * sin(phi);

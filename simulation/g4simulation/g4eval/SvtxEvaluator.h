@@ -1,5 +1,5 @@
-#ifndef __SVTXEVALUATOR_H__
-#define __SVTXEVALUATOR_H__
+#ifndef SVTXEVALUATOR_H__
+#define SVTXEVALUATOR_H__
 
 //===============================================
 /// \file SvtxEvaluator.h
@@ -7,17 +7,17 @@
 /// \author Michael P. McCumber (revised SVTX version)
 //===============================================
 
-#include "SvtxEvalStack.h"
 
-// PHENIX includes
 #include <fun4all/SubsysReco.h>
-#include <fun4all/Fun4AllReturnCodes.h>
-#include <phool/PHCompositeNode.h>
-
-#include <TNtuple.h>
-#include <TFile.h>
-
+#include <phool/PHTimeServer.h>
+#include <phool/PHTimer.h>
 #include <string>
+
+class PHCompositeNode;
+
+class SvtxEvalStack;
+class TFile;
+class TNtuple;
 
 /// \class SvtxEvaluator
 ///
@@ -32,7 +32,11 @@ class SvtxEvaluator : public SubsysReco {
 public:
  
   SvtxEvaluator(const std::string &name = "SVTXEVALUATOR",
-                const std::string &filename = "g4eval.root");
+                const std::string &filename = "g4eval.root",
+                const std::string &trackmapname = "SvtxTrackMap",
+		unsigned int nlayers_maps = 3,
+		unsigned int nlayers_intt = 4,
+		unsigned int nlayers_tpc = 60);
   virtual ~SvtxEvaluator() {}
 		
   int Init(PHCompositeNode *topNode);
@@ -49,6 +53,10 @@ public:
   void do_cluster_eval(bool b) {_do_cluster_eval = b;}
   void do_gtrack_eval(bool b) {_do_gtrack_eval = b;}
   void do_track_eval(bool b) {_do_track_eval = b;}
+
+  void do_track_match(bool b) {_do_track_match = b;}
+  void do_eval_light(bool b) {_do_eval_light = b;}
+  void scan_for_embedded(bool b) {_scan_for_embedded = b;}
   
  private:
 
@@ -70,7 +78,15 @@ public:
   bool _do_cluster_eval;
   bool _do_gtrack_eval;
   bool _do_track_eval;
-  
+
+  bool _do_track_match;
+  bool _do_eval_light;
+  bool _scan_for_embedded;
+
+  unsigned int _nlayers_maps = 3;
+  unsigned int _nlayers_intt = 4;
+  unsigned int _nlayers_tpc = 60;
+
   TNtuple *_ntp_vertex;
   TNtuple *_ntp_gpoint;
   TNtuple *_ntp_g4hit;
@@ -81,7 +97,11 @@ public:
 
   // evaluator output file
   std::string _filename;
+  //Track map name
+  std::string _trackmapname;
   TFile *_tfile;
+
+  PHTimer *_timer;
 
   // output subroutines
   void fillOutputNtuples(PHCompositeNode* topNode); ///< dump the evaluator information into ntuple for external analysis

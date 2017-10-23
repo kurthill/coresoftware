@@ -4,16 +4,18 @@
 #include <fun4all/SubsysReco.h>
 #include <phool/PHTimeServer.h>
 #include <map>
+#include <limits.h>
 
 class SvtxHitMap;
 class SvtxClusterMap;
-class PHG4CylinderCell;
+class PHG4Cell;
 
 class PHG4SvtxClusterizer : public SubsysReco {
 
 public:
 
-  PHG4SvtxClusterizer(const std::string &name = "PHG4SvtxClusterizer");
+  PHG4SvtxClusterizer(const std::string &name = "PHG4SvtxClusterizer",
+		      unsigned int min_layer = 0, unsigned int max_layer = UINT_MAX);
   virtual ~PHG4SvtxClusterizer(){}
   
   //! module initialization
@@ -57,21 +59,27 @@ public:
 
 private:
 
-  static bool lessthan(const PHG4CylinderCell*, 
-		       const PHG4CylinderCell*);
-  static bool ladder_lessthan(const PHG4CylinderCell*, 
-			      const PHG4CylinderCell*);
-  bool are_adjacent(const PHG4CylinderCell*, 
-		    const PHG4CylinderCell*, 
+  static bool lessthan(const PHG4Cell*, 
+		       const PHG4Cell*);
+  static bool ladder_lessthan(const PHG4Cell*, 
+			      const PHG4Cell*);
+  static bool maps_ladder_lessthan(const PHG4Cell*, 
+			      const PHG4Cell*);
+  bool are_adjacent(const PHG4Cell*, 
+		    const PHG4Cell*, 
 		    const int &);
-  bool ladder_are_adjacent(const PHG4CylinderCell*, 
-			   const PHG4CylinderCell*);
-  
+  bool ladder_are_adjacent(const PHG4Cell*, 
+			   const PHG4Cell*);
+  bool maps_ladder_are_adjacent(const PHG4Cell*,
+				const PHG4Cell*);
+
   void CalculateCylinderThresholds(PHCompositeNode *topNode);
   void CalculateLadderThresholds(PHCompositeNode *topNode);
+  void CalculateMapsLadderThresholds(PHCompositeNode *topNode);
   
   void ClusterCylinderCells(PHCompositeNode *topNode);
   void ClusterLadderCells(PHCompositeNode *topNode);
+  void ClusterMapsLadderCells(PHCompositeNode *topNode);
 
   void PrintClusters(PHCompositeNode *topNode);
   
@@ -84,6 +92,9 @@ private:
   std::map<int,float> _thresholds_by_layer; // layer->threshold
   std::map<int,bool> _make_z_clustering;    // layer->z_clustering_option
   std::map<int,bool> _make_e_weights;       // layer->energy_weighting_option
+
+  unsigned int _min_layer;
+  unsigned int _max_layer;
   
   PHTimeServer::timer _timer;
 };
